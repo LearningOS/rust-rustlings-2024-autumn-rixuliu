@@ -39,6 +39,25 @@ fn build_scores_table(results: String) -> HashMap<String, Team> {
         // will be the number of goals conceded from team_2, and similarly
         // goals scored by team_2 will be the number of goals conceded by
         // team_1.
+        let team_1 = Team {
+            goals_scored: team_1_score,
+            goals_conceded: team_2_score,
+        };
+        let team_1_ref = scores.entry(team_1_name.clone()).or_insert(team_1);
+        (*team_1_ref).goals_scored = (*team_1_ref).goals_scored + team_1_score;
+        (*team_1_ref).goals_conceded = (*team_1_ref).goals_conceded + team_2_score;
+        let team = scores.get(&team_1_name).unwrap();
+        println!("team1:{} {}, {}", team_1_name, team.goals_scored, team.goals_conceded);
+
+        let team_2 = Team {
+            goals_scored: team_2_score,
+            goals_conceded: team_1_score,
+        };
+        let team_2_ref = scores.entry(team_2_name.clone()).or_insert(team_2);
+        (*team_2_ref).goals_scored = (*team_2_ref).goals_scored + team_2_score;
+        (*team_2_ref).goals_conceded = (*team_2_ref).goals_conceded + team_1_score;
+        let team = scores.get(&team_2_name).unwrap();
+        println!("team2:{} {}, {}", team_2_name, team.goals_scored, team.goals_conceded);
     }
     scores
 }
@@ -72,6 +91,7 @@ mod tests {
     fn validate_team_score_1() {
         let scores = build_scores_table(get_results());
         let team = scores.get("England").unwrap();
+        println!("++++ {}， {} == exp 5, 4", team.goals_scored, team.goals_conceded);
         assert_eq!(team.goals_scored, 5);
         assert_eq!(team.goals_conceded, 4);
     }
@@ -80,6 +100,8 @@ mod tests {
     fn validate_team_score_2() {
         let scores = build_scores_table(get_results());
         let team = scores.get("Spain").unwrap();
+
+        println!("--- {}， {} == exp 0， 2", team.goals_scored, team.goals_conceded);
         assert_eq!(team.goals_scored, 0);
         assert_eq!(team.goals_conceded, 2);
     }
