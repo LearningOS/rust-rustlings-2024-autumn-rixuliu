@@ -16,7 +16,16 @@
 //
 // Execute `rustlings hint quiz3` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
+// I AM DONE
+use std::fmt::Display;
+
+pub trait QuizU32 {
+    fn print(&self) -> String;
+}
+
+pub trait QuizString {
+    fn print(&self) -> String;
+}
 
 pub struct ReportCard {
     pub grade: f32,
@@ -24,10 +33,37 @@ pub struct ReportCard {
     pub student_age: u8,
 }
 
-impl ReportCard {
-    pub fn print(&self) -> String {
+impl QuizU32 for ReportCard {
+    fn print(&self) -> String {
         format!("{} ({}) - achieved a grade of {}",
-            &self.student_name, &self.student_age, &self.grade)
+            &self.student_name, &self.student_age, &self.grade.to_string())
+    }
+}
+
+impl QuizString for ReportCard {
+    fn print(&self) -> String {
+        let mut grade_string = String::new();
+        match self.grade {
+            4.0..=5.0 => grade_string = "A+".to_string(),
+            3.7..=3.9 => grade_string = "A".to_string(),
+            3.3..=3.6 => grade_string = "A-".to_string(),
+            3.0..=3.2 => grade_string = "B+".to_string(),
+            2.7..=2.9 => grade_string = "B".to_string(),
+            2.3..=2.6 => grade_string = "B-".to_string(),
+            2.0..=2.2 => {
+                if self.student_age == 11 {
+                    grade_string = "A+".to_string()
+                } else if self.student_age == 12 {
+                    grade_string = "C+".to_string()
+                }
+            },
+            1.7..=1.9 => grade_string = "C".to_string(),
+            1.3..=1.6 => grade_string = "C-".to_string(),
+            1.0..=1.2 => grade_string = "D".to_string(),
+            _ => grade_string = "F".to_string(),
+        }
+        format!("{} ({}) - achieved a grade of {}",
+            &self.student_name, &self.student_age, &grade_string)
     }
 }
 
@@ -43,7 +79,7 @@ mod tests {
             student_age: 12,
         };
         assert_eq!(
-            report_card.print(),
+            QuizU32::print(&report_card),
             "Tom Wriggle (12) - achieved a grade of 2.1"
         );
     }
@@ -57,7 +93,7 @@ mod tests {
             student_age: 11,
         };
         assert_eq!(
-            report_card.print(),
+            QuizString::print(&report_card),
             "Gary Plotter (11) - achieved a grade of A+"
         );
     }
