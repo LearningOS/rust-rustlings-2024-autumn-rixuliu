@@ -12,7 +12,7 @@
 //
 // Execute `rustlings hint cow1` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
+// I AM DONE
 
 use std::borrow::Cow;
 
@@ -37,7 +37,13 @@ mod tests {
         let slice = [-1, 0, 1];
         let mut input = Cow::from(&slice[..]);
         match abs_all(&mut input) {
-            Cow::Owned(_) => Ok(()),
+            Cow::Owned(vec) => {
+                if *vec == vec![1, 0, 1] {
+                    Ok(()) // Ensure values are modified correctly
+                } else {
+                    Err("Expected mutated values [1, 0, 1]")
+                }
+            }
             _ => Err("Expected owned value"),
         }
     }
@@ -48,31 +54,36 @@ mod tests {
         let slice = [0, 1, 2];
         let mut input = Cow::from(&slice[..]);
         match abs_all(&mut input) {
-            // TODO
+            Cow::Borrowed(_) => Ok(()), // Expecting a borrowed value since no mutation happened
+            _ => Err("Expected borrowed value"),
         }
     }
 
     #[test]
     fn owned_no_mutation() -> Result<(), &'static str> {
-        // We can also pass `slice` without `&` so Cow owns it directly. In this
-        // case no mutation occurs and thus also no clone, but the result is
-        // still owned because it was never borrowed or mutated.
+        // We can also pass `slice` without `&` so Cow owns it directly.
         let slice = vec![0, 1, 2];
         let mut input = Cow::from(slice);
         match abs_all(&mut input) {
-            // TODO
+            Cow::Owned(_) => Ok(()), // Expecting an owned value because it was initially owned
+            _ => Err("Expected owned value"),
         }
     }
 
     #[test]
     fn owned_mutation() -> Result<(), &'static str> {
-        // Of course this is also the case if a mutation does occur. In this
-        // case the call to `to_mut()` returns a reference to the same data as
-        // before.
+        // If a mutation does occur, the values should be modified.
         let slice = vec![-1, 0, 1];
         let mut input = Cow::from(slice);
         match abs_all(&mut input) {
-            // TODO
+            Cow::Owned(ref vec) => {
+                if vec == &[1, 0, 1] { // Check if values were mutated correctly
+                    Ok(())
+                } else {
+                    Err("Values were not mutated correctly")
+                }
+            }
+            _ => Err("Expected owned value"),
         }
     }
 }
