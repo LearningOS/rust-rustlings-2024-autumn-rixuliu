@@ -2,7 +2,7 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+// I AM DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -23,7 +23,7 @@ where
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
             count: 0,
-            items: vec![T::default()],
+            items: vec![T::default()], // Start with a default value for the heap's root
             comparator,
         }
     }
@@ -37,7 +37,15 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        // Insert the new value at the end of the vector
+        self.count += 1;
+        if self.count < self.items.len() {
+            self.items[self.count] = value;
+        } else {
+            self.items.push(value);
+        }
+        // Reheapify
+        self.bubble_up(self.count);
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +65,44 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left_child = self.left_child_idx(idx);
+        let right_child = self.right_child_idx(idx);
+
+        if right_child <= self.count && (self.comparator)(&self.items[right_child], &self.items[left_child]) {
+            right_child
+        } else {
+            left_child
+        }
+    }
+
+    fn bubble_up(&mut self, idx: usize) {
+        let mut current_idx = idx;
+
+        while current_idx > 1 {
+            let parent_idx = self.parent_idx(current_idx);
+            if (self.comparator)(&self.items[current_idx], &self.items[parent_idx]) {
+                // Swap if current is less than parent
+                self.items.swap(current_idx, parent_idx);
+                current_idx = parent_idx; // Move up
+            } else {
+                break; // No more bubbling up needed
+            }
+        }
+    }
+
+    fn bubble_down(&mut self, idx: usize) {
+        let mut current_idx = idx;
+
+        while self.children_present(current_idx) {
+            let child_idx = self.smallest_child_idx(current_idx);
+            if (self.comparator)(&self.items[child_idx], &self.items[current_idx]) {
+                // Swap if child is less than current
+                self.items.swap(current_idx, child_idx);
+                current_idx = child_idx; // Move down
+            } else {
+                break; // No more bubbling down needed
+            }
+        }
     }
 }
 
@@ -84,8 +128,21 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            return None; // No more elements to iterate
+        }
+
+        // Swap the first item (minimum/maximum) with the last item
+        self.items.swap(1, self.count);
+        let value = self.items.pop().unwrap(); // Remove the last item, which is the extracted value
+        self.count -= 1;
+
+        // Bubble down from the root to maintain the heap property
+        if !self.is_empty() {
+            self.bubble_down(1);
+        }
+
+        Some(value)
     }
 }
 
@@ -116,6 +173,7 @@ impl MaxHeap {
 #[cfg(test)]
 mod tests {
     use super::*;
+    
     #[test]
     fn test_empty_heap() {
         let mut heap = MaxHeap::new::<i32>();

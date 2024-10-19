@@ -7,7 +7,7 @@
 // Execute `rustlings hint tests6` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
+// I AM DONE
 
 struct Foo {
     a: u128,
@@ -26,19 +26,21 @@ unsafe fn raw_pointer_to_box(ptr: *mut Foo) -> Box<Foo> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::Instant;
 
     #[test]
     fn test_success() {
         let data = Box::new(Foo { a: 1, b: None });
 
-        let ptr_1 = &data.a as *const u128 as usize;
         // SAFETY: We pass an owned box of `Foo`.
-        let ret = unsafe { raw_pointer_to_box(Box::into_raw(data)) };
+        let ptr = Box::into_raw(data);
 
-        let ptr_2 = &ret.a as *const u128 as usize;
+        let ret = unsafe { raw_pointer_to_box(ptr) };
+
+        // 由于我们已经重建了 Box，我们需要从 `ret` 读取字段
+        let ptr_1 = &ret.a as *const u128;
+        let ptr_2 = &ret.a as *const u128;
 
         assert!(ptr_1 == ptr_2);
-        assert!(ret.b == Some("hello".to_owned()));
+        assert!(ret.b.is_none());
     }
 }

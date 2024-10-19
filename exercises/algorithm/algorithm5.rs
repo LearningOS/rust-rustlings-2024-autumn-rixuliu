@@ -3,7 +3,7 @@
 	This problem requires you to implement a basic BFS algorithm
 */
 
-//I AM NOT DONE
+//I AM DONE
 use std::collections::VecDeque;
 
 // Define a graph
@@ -22,19 +22,39 @@ impl Graph {
     // Add an edge to the graph
     fn add_edge(&mut self, src: usize, dest: usize) {
         self.adj[src].push(dest); 
-        self.adj[dest].push(src); 
+        self.adj[dest].push(src); // For undirected graph
     }
 
     // Perform a breadth-first search on the graph, return the order of visited nodes
     fn bfs_with_return(&self, start: usize) -> Vec<usize> {
-        
-		//TODO
+        let mut visit_order = vec![];               // To store the order of visited nodes
+        let mut queue = VecDeque::new();            // Queue for BFS
+        let mut visited = vec![false; self.adj.len()]; // Keep track of visited nodes
 
-        let mut visit_order = vec![];
+        // Check if the start index is valid
+        if start >= self.adj.len() {
+            return visit_order; // Return empty if start is out of bounds
+        }
+
+        // Start the BFS from the start node
+        queue.push_back(start);
+        visited[start] = true;                       // Mark the start node as visited
+
+        while let Some(node) = queue.pop_front() {  // While there are nodes to visit
+            visit_order.push(node);                  // Add the current node to the visit order
+            
+            // Visit all unvisited neighbors
+            for &neighbor in &self.adj[node] {
+                if !visited[neighbor] {
+                    visited[neighbor] = true;       // Mark the neighbor as visited
+                    queue.push_back(neighbor);      // Add the neighbor to the queue
+                }
+            }
+        }
+
         visit_order
     }
 }
-
 
 #[cfg(test)]
 mod tests {
